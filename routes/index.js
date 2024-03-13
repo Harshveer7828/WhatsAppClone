@@ -4,16 +4,17 @@ const passport = require('passport');
 const userModel =  require('./users.js');
 
 const controller = require('../controller/controller');
+const localStrategy = require('passport-local');
+
+passport.use(new localStrategy(userModel.authenticate()));
 
 /* GET home page. */
 
 
 router.get('/',controller.register);
-router.get('/index',(req,res) =>{
-   res.render('index.ejs');
-});
+router.get('/home',isLoggedIn,controller.home);
 
-
+router.get('/login',controller.login);
 
 
 // *************** authentication code ********************************
@@ -29,7 +30,7 @@ router.post('/register',(req,res,next) =>{
   userModel.register(userData,req.body.password)
   .then( (registereduser) => {
    passport.authenticate('local')(req,res, ()=> {
-     res.redirect('/index');
+     res.redirect('/home');
     });
    });
 });
@@ -39,7 +40,7 @@ router.post('/register',(req,res,next) =>{
 
 //login route
 router.post('/login',passport.authenticate('local',{
-   successRedirect: '/index' ,
+   successRedirect: '/home' ,
    failureRedirect: '/' 
 }), (req, res) => {});
 
@@ -58,5 +59,6 @@ function isLoggedIn(req,res,next){
   }
  res.redirect('/');
 }
+
 
 module.exports = router;
