@@ -19,12 +19,20 @@ app.set('view engine', 'ejs');
 app.use(expressSession({
    resave:false,
    saveUninitialized:false,
-   secret:secret
+   secret:"secret-hey"
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-passport.serializeUser(userRouter.serializeUser());
-passport.deserializeUser(userRouter.deserializeUser());
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  // Fetch user from database based on id
+  User.findById(id, (err, user) => {
+      done(err, user);
+  });
+});
 
 
 app.use(logger('dev'));

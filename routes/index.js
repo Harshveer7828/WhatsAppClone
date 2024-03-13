@@ -9,6 +9,9 @@ const controller = require('../controller/controller');
 
 
 router.get('/',controller.register);
+router.get('/index',(req,res) =>{
+   res.render('index.ejs');
+});
 
 
 
@@ -20,13 +23,13 @@ router.get('/',controller.register);
 router.post('/register',(req,res,next) =>{
   const userData = new userModel({
     username : req.body.username,
-    secret : req.body.secret
+    email : req.body.email
   });
   
   userModel.register(userData,req.body.password)
   .then( (registereduser) => {
    passport.authenticate('local')(req,res, ()=> {
-     res.redirect('/home');
+     res.redirect('/index');
     });
    });
 });
@@ -36,7 +39,7 @@ router.post('/register',(req,res,next) =>{
 
 //login route
 router.post('/login',passport.authenticate('local',{
-   successRedirect: '/home' ,
+   successRedirect: '/index' ,
    failureRedirect: '/' 
 }), (req, res) => {});
 
