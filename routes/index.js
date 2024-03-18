@@ -12,9 +12,16 @@ passport.use(new localStrategy(userModel.authenticate()));
 
 
 router.get('/',controller.register);
+
 router.get('/home',isLoggedIn,controller.home);
 
 router.get('/login',controller.login);
+
+router.post('/searchUser',isLoggedIn,controller.searchUsers);
+
+router.get('/searchUser/:userid',isLoggedIn,controller.addFriend);
+
+
 
 
 // *************** authentication code ********************************

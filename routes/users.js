@@ -8,9 +8,21 @@ const userSchema = mongoose.Schema({
     type:String,
     required:[true,"username is must for registering new user"]
   },
-  password:{
+  password:String,
+  profilePicture :{
     type:String,
-  }
+    default:'default.jpg'
+  },
+  email:String,
+  socketId : String,
+  friends : [
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'user'
+    }
+  ],
+
+  
 
 });
 
