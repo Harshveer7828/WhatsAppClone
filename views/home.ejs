@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,42 +9,75 @@
     <script src="https://kit.fontawesome.com/aebaa313fa.js" crossorigin="anonymous"></script>
 
 </head>
+
 <body>
     <div class="wrapper h-screen w-screen bg-zinc-900 flex">
 
         <!-- search container where the logged in user add the new user -->
-        <div class="search-container absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-orange-600 h-[50%] w-[30%] rounded-xl  z-[9] hidden">
-            <i class="fa-solid fa-xmark absolute top-[-2vh] right-[-1vw] text-white bg-red-600 px-2 py-1.5 rounded-full cursor-pointer close-btn"></i>
+        <div
+            class="search-container absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] bg-orange-600 h-[50%] w-[30%] rounded-xl  z-[9] hidden">
+            <i
+                class="fa-solid fa-xmark absolute top-[-2vh] right-[-1vw] text-white bg-red-600 px-2 py-1.5 rounded-full cursor-pointer close-btn"></i>
             <div class="searchBox flex items-center ml-1 mt-1 p-2 h-[8vh]">
-                <input class="w-[90%] bg-transparent border rounded-full text-white px-2 h-full outline-none" type="text" name="searchUser" id="searchBox" placeholder="Search New Friend Here!">
+                <input class="w-[90%] bg-transparent border rounded-full text-white px-2 h-full outline-none"
+                    type="text" name="searchUser" id="searchBox" placeholder="Search New Friend Here!">
             </div>
             <div class="allUsers min-h-[40%] w-full">
-                
+
             </div>
         </div>
 
         <div class="left h-full w-[25vw] bg-zinc-700 relative">
             <div class="userInfo h-20 w-full bg-orange-600 flex items-center px-2 justify-between">
                 <div class="userDets flex items-center gap-4">
-                    <div class="dp h-[4vw] w-[4vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/<%=user.profilePicture%>" alt=""></div>
-                    <h3 class="text-white text-1xl font-bold"><%= user.username %></h3>
+                    <div class="dp h-[4vw] w-[4vw] bg-zinc-900 rounded-full overflow-hidden"><img
+                            class="h-full w-full object-cover " src="/images/<%=loggedUser.profilePicture%>" alt=""></div>
+                    <h3 class="text-white text-1xl font-bold">
+                        <%= loggedUser.username %>
+                    </h3>
                 </div>
                 <i class="fa-solid fa-user-plus text-white text-2xl mr-2 cursor-pointer addUser"></i>
             </div>
             <div class="friendsSection w-full">
-                <% user.friends.forEach( (friend)=>{ %>
-                    <div class="userInfo h-20 w-full flex items-center px-7 gap-4">
-                        <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/<%=user.profilePicture%>" alt=""></div>
-                        <h3 class="text-white text-2xl font-bold"><%= friend.username %></h3>
+                <% loggedUser.friends.forEach( (friend)=>{ %>
+                    <div onclick="openChat('<%=friend.username%>','<%=friend. profilePicture%>','<%=friend.id%>')"
+                        id="$user/<%=friend.username%>" class="userInfo h-20 w-full flex items-center px-7 gap-4">
+                        <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img
+                                class="h-full w-full object-cover " src="/images/<%=friend.profilePicture%>" alt=""></div>
+                        <h3 class="text-white text-2xl font-bold">
+                            <%= friend.username %>
+                        </h3>
                     </div>
-                <% } ) %>
+                    <% } ) %>
             </div>
 
         </div>
         <div class="right w-[75vw] relative">
-            <div class="userInfo h-20 w-full bg-zinc-600 flex items-center px-2 gap-4 absolute top-0">
-                <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/<%=user.profilePicture%>" alt=""></div>
-                <h3 class="text-white text-2xl font-bold">BaatKrneWalaDost</h3>
+
+        </div>
+    </div>
+    <!-- axios cdn  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
+        integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        let SendBtn = document.querySelector("#send-btn");
+
+        // sends the socket id forEACH USEr in the schema 
+
+        const username = '<%= loggedUser.username %>'
+        let oppositeUser = null;
+        socket.emit('join-server', username)
+
+
+        // open user chats by clicking on the friends name
+
+        function openChat(username, profileImage, id) {
+            document.querySelector(".right").innerHTML = `<div class="userInfo h-20 w-full bg-zinc-600 flex items-center px-2 gap-4 absolute top-0">
+                <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/${profileImage}" alt=""></div>
+                <h3 class="text-white text-2xl font-bold">${username}</h3>
             </div>
             <div class="messages min-h-[80vh] w-full absolute top-[15vh] ">
                 
@@ -52,95 +86,111 @@
             <div class="bottom absolute bottom-0 w-[70vw]  p-4">
                 <div class="flex items-center gap-2 justify-center">
                     <input class="bg-zinc-900 text-white w-[30%] border-none outline-none" type="text" placeholder="Enter your Message" id="message">
-                    <input onclick="OutGoingMessage()"  class="text-white font-bold bg-orange-600 p-2 rounded-2xl cursor-pointer" type="submit" value="SEND" id="send-btn">
+                    <input onclick="sendMessage()"  class="text-white font-bold bg-orange-600 p-2 rounded-2xl cursor-pointer" type="submit" value="SEND" id="send-btn">
                 </div>
-            </div>
-        </div>
-    </div>
-    <!-- axios cdn  -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <script>
-
-        let SendBtn = document.querySelector("#send-btn");
+            </div>`
+            oppositeUser = username;
+        }
 
         //outgoing meesage from the logged in user
 
-        function OutGoingMessage() {
-            const message = document.querySelector("#message").value;
+        function OutGoingMessage(message) {
+           
             const template = `<div class="OutGoingMessage text-white bg-orange-600 w-fit mt-1 p-2 rounded-2xl ml-auto mr-2 flex gap-2">
                     <h3>${message}</h3>
                     <h6 class="text-xs ml-auto w-fit mt-4">16:50</h6>
                 </div>`;
 
             document.querySelector(".messages").innerHTML += template;
-            document.querySelector("#message").value = "";
-            
+           
+
         }
-        function IncommingMessage() {
-            const message = document.querySelector("#message").value;
+        function IncommingMessage(message) {
             const template = `<div class="IncommingMessage text-white bg-zinc-600 w-fit p-2 rounded-2xl mr-auto ml-2 mt-1 flex gap-2">
                     <h3>${message}</h3>
                     <h6 class="text-xs ml-auto w-fit mt-4">16:50</h6>
                 </div>`;
 
             document.querySelector(".messages").innerHTML += template;
-            document.querySelector("#message").value = "";
             
+
         }
 
         // open searchBox by clicking the add user icon 
 
         let addUser = document.querySelector(".addUser");
-        addUser.addEventListener("click",()=>{
+        addUser.addEventListener("click", () => {
             document.querySelector('.search-container').classList.remove('hidden');
         })
 
         // close the saerchj box by clicking the close button
 
         let closebtn = document.querySelector(".close-btn");
-        closebtn.addEventListener("click",()=>{
+        closebtn.addEventListener("click", () => {
             document.querySelector('.search-container').classList.add('hidden');
         })
-        
-        
+
+
         //search the user by using axious
 
         const searchBox = document.querySelector("#searchBox");
-        searchBox.addEventListener("input", async ()=>{
+        searchBox.addEventListener("input", async () => {
 
             // empty the template or all user section on each value which prevents the repeataion of users in the template
 
-            document.querySelector(".allUsers").innerHTML = ""; 
+            document.querySelector(".allUsers").innerHTML = "";
             console.log(searchBox.value)
-            const data = searchBox.value; 
-           
-            if(searchBox.value !== ''){
+            const data = searchBox.value;
+
+            if (searchBox.value !== '') {
 
                 // sends the axios req to the server ans recieve the json format from the server to the client
 
-                const response = await axios.post('/searchUser',{
-                    data : data,
+                const response = await axios.post('/searchUser', {
+                    data: data,
                 })
 
                 // In the json data we get data field which is the array of the information of the requested user
 
-                response.data.forEach(function (user){
+                response.data.forEach(function (user) {
                     const template = `<a href="/searchUser/${user._id}" class="userDets flex items-center gap-4 p-1 mt-1 ml-2 cursor-pointer">
-                    <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/<%=user.profilePicture%>" alt=""></div>
+                    <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/${user.profilePicture}" alt=""></div>
                     <h3 class="text-white text-1xl font-bold">${user.username}</h3>
                     </a>`
 
-                    document.querySelector(".allUsers").innerHTML+=template;
-                
-                })  
+                    document.querySelector(".allUsers").innerHTML += template;
+
+                })
             }
         })
 
-        
+        // function which sends the message to the opposite user.
+
+        function sendMessage(){
+            const message = document.querySelector("#message").value;
+            OutGoingMessage(message);
+            document.querySelector("#message").value = "";
+            const messageDetails = {
+                message,
+                reciever : oppositeUser,
+                sender : username
+            }
+            socket.emit('send-private-messages',messageDetails);
+
+
+        }
+
+        socket.on('recieving-private-message',messageObject =>{
+            IncommingMessage(messageObject.message);
+        })
+
+
+
+
 
 
     </script>
 
 </body>
+
 </html>

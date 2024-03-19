@@ -24,6 +24,8 @@ router.get('/searchUser/:userid',isLoggedIn,controller.addFriend);
 
 
 
+
+
 // *************** authentication code ********************************
 
 
