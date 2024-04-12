@@ -29,12 +29,12 @@ io.on( "connection", function( socket ) {
             message  : messageObject.message,
             
         })
-
+        console.log(messageObject);
+        
         // push message to the reciever also
         const reciever = await userModel.findOne({
             username : messageObject.reciever 
         })
-
         socket.to(reciever.socketId).emit('recieving-private-message',messageObject);
 
     })

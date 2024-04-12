@@ -21,6 +21,7 @@ router.post('/searchUser',isLoggedIn,controller.searchUsers);
 
 router.get('/searchUser/:userid',isLoggedIn,controller.addFriend);
 
+router.post('/getmessage',isLoggedIn,controller.getMessage);
 
 
 

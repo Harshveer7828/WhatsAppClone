@@ -2,14 +2,8 @@ const mongoose = require('mongoose');
 
 
 const messageSchema = mongoose.Schema({
-    sender : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'user'
-    },
-    reciever : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'user'
-    },
+    sender : String,
+    reciever : String,
     message :String,
     time:{
         type : Date,

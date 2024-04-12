@@ -31,7 +31,8 @@
             <div class="userInfo h-20 w-full bg-orange-600 flex items-center px-2 justify-between">
                 <div class="userDets flex items-center gap-4">
                     <div class="dp h-[4vw] w-[4vw] bg-zinc-900 rounded-full overflow-hidden"><img
-                            class="h-full w-full object-cover " src="/images/<%=loggedUser.profilePicture%>" alt=""></div>
+                            class="h-full w-full object-cover " src="/images/<%=loggedUser.profilePicture%>" alt="">
+                    </div>
                     <h3 class="text-white text-1xl font-bold">
                         <%= loggedUser.username %>
                     </h3>
@@ -43,7 +44,8 @@
                     <div onclick="openChat('<%=friend.username%>','<%=friend. profilePicture%>','<%=friend.id%>')"
                         id="$user/<%=friend.username%>" class="userInfo h-20 w-full flex items-center px-7 gap-4">
                         <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img
-                                class="h-full w-full object-cover " src="/images/<%=friend.profilePicture%>" alt=""></div>
+                                class="h-full w-full object-cover " src="/images/<%=friend.profilePicture%>" alt="">
+                        </div>
                         <h3 class="text-white text-2xl font-bold">
                             <%= friend.username %>
                         </h3>
@@ -53,6 +55,17 @@
 
         </div>
         <div class="right w-[75vw] relative">
+
+
+            <div class="OutGoingMessage text-white bg-orange-600 w-fit mt-1 p-2 rounded-2xl ml-auto mr-2 flex gap-2">
+                <h3></h3>
+                <h6 class="text-xs ml-auto w-fit mt-4">16:50</h6>
+            </div>
+            <div class="IncommingMessage text-white bg-zinc-600 w-fit p-2 rounded-2xl mr-auto ml-2 mt-1 flex gap-2">
+                <h3></h3>
+                <h6 class="text-xs ml-auto w-fit mt-4">16:50</h6>
+            </div>
+
 
         </div>
     </div>
@@ -74,45 +87,31 @@
 
         // open user chats by clicking on the friends name
 
-        function openChat(username, profileImage, id) {
-            document.querySelector(".right").innerHTML = `<div class="userInfo h-20 w-full bg-zinc-600 flex items-center px-2 gap-4 absolute top-0">
-                <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/${profileImage}" alt=""></div>
-                <h3 class="text-white text-2xl font-bold">${username}</h3>
-            </div>
-            <div class="messages min-h-[80vh] w-full absolute top-[15vh] ">
-                
-            </div>
-
-            <div class="bottom absolute bottom-0 w-[70vw]  p-4">
-                <div class="flex items-center gap-2 justify-center">
-                    <input class="bg-zinc-900 text-white w-[30%] border-none outline-none" type="text" placeholder="Enter your Message" id="message">
-                    <input onclick="sendMessage()"  class="text-white font-bold bg-orange-600 p-2 rounded-2xl cursor-pointer" type="submit" value="SEND" id="send-btn">
-                </div>
-            </div>`
-            oppositeUser = username;
-        }
+    
 
         //outgoing meesage from the logged in user
 
         function OutGoingMessage(message) {
-           
+            if(message !== "") {
             const template = `<div class="OutGoingMessage text-white bg-orange-600 w-fit mt-1 p-2 rounded-2xl ml-auto mr-2 flex gap-2">
                     <h3>${message}</h3>
                     <h6 class="text-xs ml-auto w-fit mt-4">16:50</h6>
                 </div>`;
 
             document.querySelector(".messages").innerHTML += template;
-           
+            }
 
         }
         function IncommingMessage(message) {
+            if(message !== '') {
+
             const template = `<div class="IncommingMessage text-white bg-zinc-600 w-fit p-2 rounded-2xl mr-auto ml-2 mt-1 flex gap-2">
                     <h3>${message}</h3>
                     <h6 class="text-xs ml-auto w-fit mt-4">16:50</h6>
                 </div>`;
 
             document.querySelector(".messages").innerHTML += template;
-            
+            }
 
         }
 
@@ -139,7 +138,6 @@
             // empty the template or all user section on each value which prevents the repeataion of users in the template
 
             document.querySelector(".allUsers").innerHTML = "";
-            console.log(searchBox.value)
             const data = searchBox.value;
 
             if (searchBox.value !== '') {
@@ -166,25 +164,52 @@
 
         // function which sends the message to the opposite user.
 
-        function sendMessage(){
+        function sendMessage() {
             const message = document.querySelector("#message").value;
-            OutGoingMessage(message);
             document.querySelector("#message").value = "";
             const messageDetails = {
                 message,
-                reciever : oppositeUser,
-                sender : username
+                reciever: oppositeUser,
+                sender: username
             }
-            socket.emit('send-private-messages',messageDetails);
-
-
+            socket.emit('send-private-message', messageDetails);
+            OutGoingMessage(message);
         }
 
-        socket.on('recieving-private-message',messageObject =>{
+        socket.on('recieving-private-message', messageObject => {
             IncommingMessage(messageObject.message);
         })
 
+        async function openChat(username, profileImage, id) {
+            oppositeUser = username
+            console.log(oppositeUser);
+            const response = await axios.post('/getmessage', {
+                oppositeUser: username,
+            })
+            console.log(response);
+            document.querySelector(".right").innerHTML = `<div class="userInfo h-20 w-full bg-zinc-600 flex items-center px-2 gap-4 absolute top-0">
+                <div class="dp h-[3vw] w-[3vw] bg-zinc-900 rounded-full overflow-hidden"><img class="h-full w-full object-cover " src="/images/${profileImage}" alt=""></div>
+                <h3 class="text-white text-2xl font-bold">${username}</h3>
+            </div>
+            <div class="messages min-h-[80vh] w-full absolute top-[15vh] ">
+                
+            </div>
 
+            <div class="bottom absolute bottom-0 w-[70vw]  p-4">
+                <div class="flex items-center gap-2 justify-center">
+                    <input class="bg-zinc-900 text-white w-[30%] border-none outline-none" type="text" placeholder="Enter your Message" id="message">
+                    <input onclick="sendMessage()"  class="text-white font-bold bg-orange-600 p-2 rounded-2xl cursor-pointer" type="submit" value="SEND" id="send-btn">
+                </div>
+            </div>`
+            
+            response.data.forEach(message => {
+                if (message.sender !== username) {
+                    OutGoingMessage(message.message)
+                } else
+                    IncommingMessage(message.message)
+            })
+
+        }
 
 
 

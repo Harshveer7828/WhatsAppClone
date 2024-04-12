@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userModel =  require('../routes/users.js');
 const passport = require('passport');
-
+const messageModel = require('../routes/message.js')
 const register = function(req, res, next) {
     res.render('../views/auth/register.ejs');
   }
@@ -10,7 +10,7 @@ const register = function(req, res, next) {
 const home =async (req,res,next) =>{
   // sending logged in user to the client side
   const loggedUser = await userModel.findOne({username : req.session.passport.user}).populate('friends');
-
+  const Messages = await messageModel.findOne()
   res.render('../views/home.ejs',{loggedUser});
 }
 
@@ -36,7 +36,6 @@ const addFriend = async (req,res) =>{
   if(loggedUser.friends.indexOf(user._id) === -1 && user.username !== loggedUser.username){
     loggedUser.friends.push(user._id);
     user.friends.push(loggedUser._id)
-    console.log("ghusa")
   }
   
   await user.save();
@@ -45,9 +44,25 @@ const addFriend = async (req,res) =>{
 }
 
 const conversation = async (req,res,next)=>{
-  const user = await userModel.findOne({username : req.session.passport.user});
   const userChat = await userModel.findOne({username : req.params.username });
   res.redirect('back');
+}
+
+const getMessage = async (req, res) => {
+  const message = await messageModel.find({
+    $or: [
+      {
+        sender : req.user.username,
+        reciever : req.body.oppositeUser
+      },
+      {
+        sender : req.body.oppositeUser,
+        reciever : req.user.username
+      }
+    ]
+  })
+
+  res.status(200).json(message);
 
 }
 
@@ -62,4 +77,5 @@ module.exports = {
   searchUsers,
   addFriend,
   conversation,
+  getMessage
 }
