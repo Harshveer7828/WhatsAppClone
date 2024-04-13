@@ -30,7 +30,7 @@ router.post('/getmessage',isLoggedIn,controller.getMessage);
 // *************** authentication code ********************************
 
 
-//register route
+//register routes
 router.post('/register',(req,res,next) =>{
   const userData = new userModel({
     username : req.body.username,
